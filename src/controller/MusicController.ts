@@ -1,5 +1,6 @@
 import MusicRepository from "../repository/MusicRepository";
 import pkg from "lodash";
+import {basename} from "path";
 import FfmpegStream from "../lib/FfmpegStream";
 
 export default class MusicController {
@@ -21,6 +22,7 @@ export default class MusicController {
             let randomValue = pkg.sample(musicList) as string;
 
             new FfmpegStream(randomValue, cover).stream(server + key, () => {
+                console.log("\x1b[35m%s\x1b[0m", `🔚  End file ` + basename(randomValue));
                 musicList = pkg.without(musicList, randomValue); // Remove the played music from the list
 
                 playNextMusic(); // Replay with next music file
