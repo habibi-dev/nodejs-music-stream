@@ -1,4 +1,4 @@
-﻿# NodeJs Music Streaming Server with Node.js
+﻿# RTMPS Music Streaming Server with Node.js
 
 ![Screenshot](src/assets/cover.jpg)
 
