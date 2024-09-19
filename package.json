@@ -1,5 +1,5 @@
 {
-  "name": "telegram-music-stream",
+  "name": "nodejs-music-stream",
   "version": "1.0.0",
   "description": "Nur zum Spaß",
   "main": "src/index.ts",
@@ -10,7 +10,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/habibi-dev/telegram-music-stream.git"
+    "url": "git+https://github.com/habibi-dev/nodejs-music-stream.git"
   },
   "keywords": [
     "telegram",
@@ -19,9 +19,9 @@
   "author": "Habibi-Dev",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/habibi-dev/telegram-music-stream/issues"
+    "url": "https://github.com/habibi-dev/nodejs-music-stream/issues"
   },
-  "homepage": "https://github.com/habibi-dev/telegram-music-stream#readme",
+  "homepage": "https://github.com/habibi-dev/nodejs-music-stream#readme",
   "dependencies": {
     "dotenv": "^16.4.5",
     "fluent-ffmpeg": "^2.1.3",
