@@ -1,5 +1,5 @@
 import Ffmpeg from "fluent-ffmpeg";
-import {resolve} from 'path';
+import {basename, resolve} from 'path';
 import MP3Tag from "mp3tag.js";
 import fs from "fs";
 import pkg from "lodash";
@@ -38,6 +38,9 @@ export default class FfmpegStream {
                     `drawtext=text='${title}':fontcolor=white:fontsize=34:x=35:y=h-th-35`
                 ])
                 .output(output)
+                .on('start', () => {
+                    console.log("\x1b[32m%s\x1b[0m", `🔃  Starting Stream ${basename(this.file)}`);
+                })
                 .on('end', callback)
                 .on('error', (err) => {
                     console.error(`Error during stream: ${err.message}`);
