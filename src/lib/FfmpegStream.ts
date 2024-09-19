@@ -17,9 +17,15 @@ export default class FfmpegStream {
             .inputOption('-re')
             .videoCodec('libx264')
             .audioCodec('aac')
-            .audioBitrate('128k')
+            .audioBitrate('96k')
             .outputOption('-pix_fmt yuv420p')
             .outputOption('-shortest')
+            .outputOption('-r 24')
+            .outputOption('-probesize 1000000')
+            .outputOption('-analyzeduration 1000000')
+            .outputOption('-maxrate 1000k')
+            .outputOption('-bufsize 2000k')
+            .outputOption('-ar 44100')
             .format('flv');
     }
 
