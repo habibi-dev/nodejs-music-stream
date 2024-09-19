@@ -4,6 +4,7 @@
   "description": "Nur zum Spaß",
   "main": "src/index.ts",
   "scripts": {
+    "build": "tsc",
     "start": "tsc && node dist/index.js",
     "dev": "ts-node src/index.ts",
     "watch": "tsc --watch src/index.ts"
