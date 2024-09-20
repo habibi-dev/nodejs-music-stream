@@ -9,6 +9,10 @@ export default class FfmpegStream {
     private readonly file: string
 
     constructor(file: string, cover: string) {
+        const
+            audioCodec = pkg.get(process, "env.AUDIO_CODEC", "aac") as string,
+            audioBitrate = pkg.get(process, "env.AUDIO_BITRATE", "96k") as string;
+
         this.file = resolve(file);
         this.ffmpeg = Ffmpeg()
             .input(resolve(cover))
@@ -16,8 +20,8 @@ export default class FfmpegStream {
             .input(resolve(file))
             .inputOption('-re')
             .videoCodec('libx264')
-            .audioCodec('aac')
-            .audioBitrate('96k')
+            .audioCodec(audioCodec)
+            .audioBitrate(audioBitrate)
             .outputOption('-pix_fmt yuv420p')
             .outputOption('-shortest')
             .outputOption('-r 24')
@@ -32,9 +36,11 @@ export default class FfmpegStream {
     async stream(output: string, callback: () => void): Promise<void> {
         try {
             const title = await this.getTitleFromMetadata(this.file);
+            const scale = pkg.get(process, "env.SCALE", "1280:720") as string;
+
             this.ffmpeg
                 .videoFilter([
-                    'scale=1280:720',
+                    `scale=${scale}`,
                     `drawtext=text='${title}':fontcolor=white:fontsize=34:x=35:y=h-th-35`
                 ])
                 .output(output)
