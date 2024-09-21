@@ -14,7 +14,7 @@ export default class MusicController {
         if (pkg.isEmpty(musicList)) return;
 
         // Function to handle streaming and replay logic
-        const playNextMusic = () => {
+        const playNext = () => {
             if (pkg.isEmpty(musicList)) {
                 musicList = new MusicRepository().getMusics(); // Refresh the list when it's empty
             }
@@ -25,10 +25,10 @@ export default class MusicController {
                 console.log("\x1b[35m%s\x1b[0m", `🔚  End file ` + basename(randomValue));
                 musicList = pkg.without(musicList, randomValue); // Remove the played music from the list
 
-                playNextMusic(); // Replay with next music file
+                playNext(); // Replay with next music file
             });
         };
 
-        playNextMusic(); // Start the first song
+        playNext(); // Start the first song
     }
 }
