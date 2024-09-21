@@ -28,7 +28,6 @@
     "fluent-ffmpeg": "^2.1.3",
     "fs": "^0.0.1-security",
     "lodash": "^4.17.21",
-    "mp3tag.js": "^3.11.0",
     "ts-node": "^10.9.2"
   },
   "devDependencies": {
