@@ -72,3 +72,7 @@ Ensure `ffmpeg` is installed on your server. You can install `ffmpeg` with the f
 
 - ```SCALE:```
   - Defines the output resolution of the video stream in width:height format. For HD streams, you can use 1280:720. This setting is only applicable if you are streaming video and want to control the resolution.
+
+- ```IGNORE_DIRECTORIES:```
+  - List of directories to be ignored during the streaming process.
+  - Use this field to specify directories that should be excluded from streaming.
