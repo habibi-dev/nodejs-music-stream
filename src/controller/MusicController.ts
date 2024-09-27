@@ -1,5 +1,5 @@
 import MusicRepository from "../repository/MusicRepository";
-import pkg, {get, without} from "lodash";
+import {get, isEmpty, sample, without} from "lodash";
 import {basename} from "path";
 import FfmpegStream from "../lib/FfmpegStream";
 import config from "../../config.json"
@@ -10,21 +10,21 @@ export default class MusicController {
         const servers = get(config, "servers", []) as ServerInterface[];
 
         for (const server of servers) {
-            const {dir, ignore_directories, cover, stream_key, url_rtmp} = server;
+            const {dir, ignore_directories, label, stream_key, url_rtmp} = server;
             let files = new MusicRepository().getMusics(dir, ignore_directories)
 
-            if (pkg.isEmpty(files)) return;
+            if (isEmpty(files)) return;
 
             // Function to handle streaming and replay logic
             const playNext = () => {
-                if (pkg.isEmpty(files)) {
+                if (isEmpty(files)) {
                     files = new MusicRepository().getMusics(dir, ignore_directories) // Refresh the list when it's empty
                 }
 
-                let randomValue = pkg.sample(files) as string;
+                let randomValue = sample(files) as string;
 
                 new FfmpegStream(randomValue, server).stream(url_rtmp + stream_key, () => {
-                    console.log("\x1b[35m%s\x1b[0m", `🔚  End file ` + basename(randomValue));
+                    console.log("\x1b[35m%s\x1b[0m", `🔚 ${label} - End file ` + basename(randomValue));
                     files = without(files, randomValue); // Remove the played music from the list
 
                     playNext(); // Replay with next music file
