@@ -2,10 +2,10 @@
   "name": "nodejs-music-stream",
   "version": "1.0.0",
   "description": "Nur zum Spaß",
-  "main": "src/index.ts",
+  "main": "dist/src/index.js",
   "scripts": {
     "build": "tsc",
-    "start": "tsc && node dist/index.js",
+    "start": "tsc && node dist/src/index.js",
     "dev": "ts-node src/index.ts",
     "watch": "tsc --watch src/index.ts"
   },
