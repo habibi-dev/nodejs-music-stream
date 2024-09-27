@@ -1,4 +1,5 @@
 export interface ServerInterface {
+    "main": string,
     "stream_key": string,
     "url_rtmp": string,
     "dir": string,
