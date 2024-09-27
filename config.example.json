@@ -1,6 +1,7 @@
 {
   "servers": [
     {
+      "label": "Main",
       "stream_key": "",
       "url_rtmp": "rtmps://dc4-1.rtmp.t.me/s/",
       "dir": "files",
