@@ -1,4 +1,3 @@
-import pkg from "lodash";
 import fs from "fs";
 import * as path from "node:path";
 
