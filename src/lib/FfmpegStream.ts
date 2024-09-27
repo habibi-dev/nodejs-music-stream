@@ -1,26 +1,25 @@
 import Ffmpeg from "fluent-ffmpeg";
 import {basename, resolve} from 'path';
 import pkg from "lodash";
+import {ServerInterface} from "../interfaces/ServerInterface";
 
 export default class FfmpegStream {
     private ffmpeg: Ffmpeg.FfmpegCommand;
     private readonly file: string;
+    private readonly server: ServerInterface;
 
-    constructor(file: string, cover: string) {
+    constructor(file: string, server: ServerInterface) {
         this.file = resolve(file);
         this.ffmpeg = Ffmpeg();
+        this.server = server;
 
-        this.setupFfmpeg(cover);
+        this.setupFfmpeg();
     }
 
-    private setupFfmpeg(cover: string): void {
-        const audioCodec = pkg.get(process, "env.AUDIO_CODEC", "aac") as string;
-        const mediaType = pkg.get(process, "env.MEDIA_TYPE", "video") as string;
-        const audioSampleRate = pkg.get(process, "env.AUDIO_SAMPLE_RATE", "48000") as string;
-        const audioChannels = pkg.get(process, "env.AUDIO_CHANNELS", "2") as string;
-        const audioBitrate = pkg.get(process, "env.AUDIO_BITRATE", "128k") as string;
+    private setupFfmpeg(): void {
+        const {cover, audio_bitrate, audio_codec, media_type, audio_sample_rate, audio_channels} = this.server;
 
-        if (mediaType === "video") {
+        if (media_type === "video") {
             this.ffmpeg = this.ffmpeg
                 .input(resolve(cover))
                 .inputOption('-loop 1')
@@ -41,23 +40,23 @@ export default class FfmpegStream {
         }
 
         this.ffmpeg = this.ffmpeg
-            .audioCodec(audioCodec)
-            .audioBitrate(audioBitrate)
-            .outputOption(`-ar ${audioSampleRate}`)
-            .outputOption(`-ac ${audioChannels}`);
+            .audioCodec(audio_codec)
+            .audioBitrate(audio_bitrate)
+            .outputOption(`-ar ${audio_sample_rate}`)
+            .outputOption(`-ac ${audio_channels}`);
     }
 
     async stream(output: string, callback: () => void): Promise<void> {
+        const {media_type, scale} = this.server;
+
         try {
             const metaData = await this.getMetadata(this.file);
-            const mediaType = pkg.get(process, "env.MEDIA_TYPE", "video") as string;
-            const scale = pkg.get(process, "env.SCALE", "1280:720") as string;
             const cleanedTitle = this.cleanMetadata(pkg.get(metaData, "title", "Unknown Title"));
             const cleanedArtist = this.cleanMetadata(pkg.get(metaData, "artist", "Unknown Artist"));
             const cleanedAlbum = this.cleanMetadata(pkg.get(metaData, "album", "Unknown Album"));
             const cleanedYear = this.cleanMetadata(pkg.get(metaData, "year", "Unknown Year"));
 
-            if (mediaType === "video") {
+            if (media_type === "video") {
                 this.ffmpeg.videoFilter([
                     `scale=${scale}`,
                     `drawtext=text='${cleanedTitle}':fontcolor=white:fontsize=34:x=35:y=h-th-35`
