@@ -1,5 +1,5 @@
 export interface ServerInterface {
-    "main": string,
+    "label": string,
     "stream_key": string,
     "url_rtmp": string,
     "dir": string,
