@@ -1,34 +1,39 @@
 import MusicRepository from "../repository/MusicRepository";
-import pkg from "lodash";
+import {get, isEmpty, sample, without} from "lodash";
 import {basename} from "path";
 import FfmpegStream from "../lib/FfmpegStream";
+import config from "../../config.json"
+import {ServerInterface} from "../interfaces/ServerInterface";
 
 export default class MusicController {
+    start() {
+        const servers = get(config, "servers", []) as ServerInterface[];
 
-    start(): void {
-        let musicList = new MusicRepository().getMusics();
-        const key = pkg.get(process, "env.STREAM_KEY", "") as string;
-        const server = pkg.get(process, "env.SERVER_URL", "") as string;
-        const cover = pkg.get(process, "env.COVER", "./src/assets/cover.jpg") as string;
+        for (const server of servers) {
+            const {dir, ignore_directories, label, stream_key, url_rtmp} = server;
+            let files = new MusicRepository().getMusics(dir, ignore_directories)
 
-        if (pkg.isEmpty(musicList)) return;
+            if (isEmpty(files)) return;
 
-        // Function to handle streaming and replay logic
-        const playNext = () => {
-            if (pkg.isEmpty(musicList)) {
-                musicList = new MusicRepository().getMusics(); // Refresh the list when it's empty
-            }
+            // Function to handle streaming and replay logic
+            const playNext = () => {
+                if (isEmpty(files)) {
+                    files = new MusicRepository().getMusics(dir, ignore_directories) // Refresh the list when it's empty
+                }
 
-            let randomValue = pkg.sample(musicList) as string;
+                let randomValue = sample(files) as string;
 
-            new FfmpegStream(randomValue, cover).stream(server + key, () => {
-                console.log("\x1b[35m%s\x1b[0m", `🔚  End file ` + basename(randomValue));
-                musicList = pkg.without(musicList, randomValue); // Remove the played music from the list
+                new FfmpegStream(randomValue, server).stream(url_rtmp + stream_key, () => {
+                    console.log("\x1b[35m%s\x1b[0m", `🔚 ${label} - End file ` + basename(randomValue));
+                    files = without(files, randomValue); // Remove the played music from the list
 
-                playNext(); // Replay with next music file
-            });
-        };
+                    playNext(); // Replay with next music file
+                });
+            };
 
-        playNext(); // Start the first song
+            playNext(); // Start the first song
+
+        }
+
     }
 }

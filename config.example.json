@@ -1,0 +1,22 @@
+{
+  "servers": [
+    {
+      "label": "Main",
+      "stream_key": "",
+      "url_rtmp": "rtmps://dc4-1.rtmp.t.me/s/",
+      "dir": "files",
+      "media_type": "video",
+      "cover": "src/assets/cover.jpg",
+      "audio_codec": "aac",
+      "audio_sample_rate": 48000,
+      "audio_channels": 2,
+      "audio_bitrate": "192k",
+      "scale": "1280:720",
+      "ignore_directories": [
+        "folder1",
+        "folder2",
+        "folder2"
+      ]
+    }
+  ]
+}

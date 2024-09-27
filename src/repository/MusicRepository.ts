@@ -1,4 +1,3 @@
-import pkg from "lodash";
 import fs from "fs";
 import * as path from "node:path";
 
@@ -25,17 +24,12 @@ export default class MusicRepository {
         return arrayOfFiles;
     }
 
-    getMusics(): string[] {
-        const baseDir = pkg.get(process, "env.DIR", "files") as string + "/";
-
+    getMusics(dir: string, ign_dir: string[] = []): string[] {
         // Retrieve ignored directories from environment variable
-        const ignoredDirs = (pkg.get(process, "env.IGNORE_DIRECTORIES", "") as string)
-            .split(",")
-            .map(dir => dir.trim())
-            .filter(dir => dir !== "");
+        const ignoredDirs = ign_dir.filter(dir => dir !== "");
 
         // Get all files considering ignored directories
-        this.files = this.getAllFiles(baseDir, ignoredDirs);
+        this.files = this.getAllFiles(dir, ignoredDirs);
         return this.files;
     }
 }
