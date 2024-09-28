@@ -46,7 +46,7 @@ export default class FfmpegStream {
             .outputOption(`-ac ${audio_channels}`);
     }
 
-    async stream(output: string, callback: () => void): Promise<void> {
+    async stream(output: string, callback: () => void, callbackError: (err: Error) => void): Promise<void> {
         const {media_type, scale, label} = this.server;
 
         try {
@@ -77,10 +77,12 @@ export default class FfmpegStream {
                 .on('end', callback)
                 .on('error', (err) => {
                     console.error(`⚠️ ${label} - Error during stream: ${err.message}`);
+                    callbackError(err);
                 })
                 .run();
         } catch (err: any) {
             console.error(`⚠️ ${label} - Error fetching metadata: ${err.message}`);
+            callbackError(err);
         }
     }
 
