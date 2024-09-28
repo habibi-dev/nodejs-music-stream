@@ -28,6 +28,8 @@ export default class MusicController {
                     files = without(files, randomValue); // Remove the played music from the list
 
                     playNext(); // Replay with next music file
+                }, () => {
+                    playNext();
                 });
             };
 
