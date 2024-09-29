@@ -1,9 +1,8 @@
 import fs from 'fs';
 import path from 'path';
-import {format} from 'date-fns';
-import {toZonedTime} from 'date-fns-tz';
-import config from "../../config.json";
-import {get} from "lodash";
+import {DateTime} from 'luxon';
+import config from '../../config.json';
+import {get} from 'lodash';
 
 class Logger {
     private static baseLogDir: string;
@@ -18,24 +17,22 @@ class Logger {
         }
     }
 
-    // Get the current date and time in America/New_York timezone (America/New_York)
+    // Get the current date and time in 'America/New_York' timezone
     private static getTehranTime(): string {
-        const timeZone = get(config, "timeZone", 'America/New_York');
-        const now = new Date();
-        const tehranDate = toZonedTime(now, timeZone);
-        return format(tehranDate, 'yyyy-MM-dd HH:mm:ss');
+        const timeZone = get(config, 'timeZone', 'America/New_York');
+        const tehranDate = DateTime.now().setZone(timeZone);
+        return tehranDate.toFormat('yyyy-MM-dd HH:mm:ss');
     }
 
     // Get the log file path based on log type, optional subDir and current date
     private static getLogFilePath(logType: string, subDir?: string): string {
-        const timeZone = get(config, "timeZone", 'America/New_York');
-
-        const currentDate = format(toZonedTime(new Date(), timeZone), 'yyyy-MM-dd'); // Date in YYYY-MM-DD format
+        const timeZone = get(config, 'timeZone', 'America/New_York');
+        const currentDate = DateTime.now().setZone(timeZone).toFormat('yyyy-MM-dd'); // Date in YYYY-MM-DD format
 
         // If subDir is provided, add it to the path
         const logDir = subDir
             ? path.join(Logger.baseLogDir, subDir, logType) // baseLogDir/subDir/logType
-            : path.join(Logger.baseLogDir, logType);       // baseLogDir/logType
+            : path.join(Logger.baseLogDir, logType); // baseLogDir/logType
 
         // Create log directory (and subDir if applicable) if it doesn't exist
         if (!fs.existsSync(logDir)) {
