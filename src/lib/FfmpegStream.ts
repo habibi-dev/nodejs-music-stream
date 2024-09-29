@@ -2,6 +2,7 @@ import Ffmpeg from "fluent-ffmpeg";
 import {basename, resolve} from 'path';
 import {get} from "lodash";
 import {ServerInterface} from "../interfaces/ServerInterface";
+import Logger from "./Logger";
 
 export default class FfmpegStream {
     private ffmpeg: Ffmpeg.FfmpegCommand;
@@ -72,16 +73,16 @@ export default class FfmpegStream {
             this.ffmpeg.format('flv').output(output)
                 .on('start', (command) => {
                     // console.log(command);
-                    console.log("\x1b[32m%s\x1b[0m", `🔃 ${label} - Starting Stream ${basename(this.file)}`);
+                    Logger.info(`🔃 Starting Stream ${basename(this.file)}`, label.toLowerCase());
                 })
                 .on('end', callback)
                 .on('error', (err) => {
-                    console.error(`⚠️ ${label} - Error during stream: ${err.message}`);
+                    Logger.error(`⚠️ Error during stream: ${err.message}`, label.toLowerCase());
                     callbackError(err);
                 })
                 .run();
         } catch (err: any) {
-            console.error(`⚠️ ${label} - Error fetching metadata: ${err.message}`);
+            Logger.error(`⚠️ Error fetching metadata: ${err.message}`, label.toLowerCase());
             callbackError(err);
         }
     }
@@ -92,7 +93,7 @@ export default class FfmpegStream {
         return new Promise((resolve, reject) => {
             Ffmpeg.ffprobe(file, (err, metadata) => {
                 if (err) {
-                    console.error(`⚠️ ${label} - Error reading metadata: ${err.message}`);
+                    Logger.error(`⚠️ ${label} - Error reading metadata: ${err.message}`, label.toLowerCase());
                     return reject(err);
                 }
 
