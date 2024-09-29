@@ -4,6 +4,7 @@ import {basename} from "path";
 import FfmpegStream from "../lib/FfmpegStream";
 import config from "../../config.json";
 import {ServerInterface} from "../interfaces/ServerInterface";
+import Logger from "../lib/Logger";
 
 export default class MusicController {
     start() {
@@ -17,12 +18,12 @@ export default class MusicController {
                 try {
                     files = new MusicRepository().getMusics(dir, ignore_directories); // Attempt to get files from the directory
                 } catch (err: any) {
-                    console.error(`⛔ Error fetching music files from ${dir}: ${err.message}`);
+                    Logger.error(`⛔ Error fetching music files from ${dir}: ${err.message}`, label.toLowerCase());
                     return [];
                 }
 
                 if (isEmpty(files)) {
-                    console.error(`⛔ No files found in directory: ${dir}`);
+                    Logger.warn(`⛔ No files found in directory: ${dir}`, label.toLowerCase());
                 }
 
                 return files;
@@ -33,7 +34,7 @@ export default class MusicController {
             // Function to handle streaming and replay logic
             const playNext = () => {
                 if (isEmpty(files)) {
-                    console.log("⏳ File list is empty, trying again in 5 seconds...");
+                    Logger.warn("⏳ File list is empty, trying again in 5 seconds...", label.toLowerCase());
                     setTimeout(() => {
                         files = refreshFiles(); // Re-fetch files after 5 seconds delay
                         playNext(); // Continue playback whether files are found or not
@@ -44,13 +45,13 @@ export default class MusicController {
                 let randomValue = sample(files) as string;
 
                 new FfmpegStream(randomValue, server).stream(url_rtmp + stream_key, () => {
-                    console.log("\x1b[35m%s\x1b[0m", `🔚 ${label} - End file ` + basename(randomValue));
+                    Logger.info(`End file ` + basename(randomValue), label.toLowerCase());
                     files = without(files, randomValue); // Remove the played music from the list
 
                     playNext(); // Replay with next music file
                 }, (err) => {
                     // Handle errors in the stream (e.g. file not found or stream issues)
-                    console.error(`⛔ Streaming error for ${randomValue}: ${err.message}`);
+                    Logger.error(`⛔ Streaming error for ${randomValue}: ${err.message}`, label.toLowerCase());
                     files = refreshFiles(); // Attempt to refresh files if a stream error occurs
                     playNext();
                 });
