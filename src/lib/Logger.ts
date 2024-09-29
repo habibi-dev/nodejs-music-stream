@@ -4,7 +4,6 @@ import {format} from 'date-fns';
 import {toZonedTime} from 'date-fns-tz';
 import config from "../../config.json";
 import {get} from "lodash";
-import {ServerInterface} from "../interfaces/ServerInterface";
 
 class Logger {
     private static baseLogDir: string;
