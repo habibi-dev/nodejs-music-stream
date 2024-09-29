@@ -1,5 +1,6 @@
 import fs from "fs";
 import * as path from "node:path";
+import Logger from "../lib/Logger";
 
 export default class MusicRepository {
     private files: string[] = [];
@@ -8,7 +9,7 @@ export default class MusicRepository {
     private getAllFiles(dirPath: string, ignoredDirs: string[], arrayOfFiles: string[] = []): string[] {
         // Check if directory exists before trying to read it
         if (!fs.existsSync(dirPath)) {
-            console.error(`Directory does not exist: ${dirPath}`);
+            Logger.error(`Directory does not exist: ${dirPath}`);
             return arrayOfFiles;
         }
 
