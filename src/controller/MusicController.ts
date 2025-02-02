@@ -11,7 +11,7 @@ export default class MusicController {
         const servers = get(config, "servers", []) as ServerInterface[];
 
         for (const server of servers) {
-            const {dir, ignore_directories, label, stream_key, url_rtmp} = server;
+            const {dir, ignore_directories, label, stream_key, url_rtmp, shuffle} = server;
 
             const refreshFiles = () => {
                 let files;
@@ -36,24 +36,31 @@ export default class MusicController {
                 if (isEmpty(files)) {
                     Logger.warn("⏳ File list is empty, trying again in 5 seconds...", label.toLowerCase());
                     setTimeout(() => {
-                        files = refreshFiles(); // Re-fetch files after 5 seconds delay
-                        playNext(); // Continue playback whether files are found or not
-                    }, 5000); // 5000 milliseconds = 5 seconds
-                    return; // Exit the current function and wait for setTimeout
+                        files = refreshFiles(); // Re-fetch files
+                        playNext(); // Continue playback
+                    }, 5000);
+                    return;
                 }
 
-                let randomValue = sample(files) as string;
+                // Check the shuffle setting from the config file
+                let nextFile = shuffle ? sample(files) as string : files.shift() as string;
 
-                new FfmpegStream(randomValue, server).stream(url_rtmp + stream_key, () => {
-                    Logger.info(`End file ` + basename(randomValue), label.toLowerCase());
-                    files = without(files, randomValue); // Remove the played music from the list
+                new FfmpegStream(nextFile, server).stream(url_rtmp + stream_key, () => {
+                    Logger.info(`End file ` + basename(nextFile), label.toLowerCase());
 
-                    playNext(); // Replay with next music file
+                    // Remove the played file
+                    if (!shuffle) {
+                        if (isEmpty(files)) {
+                            files = refreshFiles(); // Refill files when all are played
+                        }
+                    } else {
+                        files = without(files, nextFile);
+                    }
+
+                    playNext(); // Play next song
                 }, (err) => {
-                    // Handle errors in the stream (e.g. file not found or stream issues)
-                    Logger.error(`⛔ Streaming error for ${randomValue}: ${err.message}`, label.toLowerCase());
-                    files = refreshFiles(); // Attempt to refresh files if a stream error occurs
-                    playNext();
+                    Logger.error(`⛔ Streaming error for ${nextFile}: ${err.message}`, label.toLowerCase());
+                    playNext(); // Skip to the next song
                 });
             };
 
