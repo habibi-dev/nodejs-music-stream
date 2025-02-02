@@ -10,5 +10,6 @@ export interface ServerInterface {
     "audio_channels": 1 | 2,
     "audio_bitrate": string,
     "scale": string,
-    "ignore_directories": string[]
+    "ignore_directories": string[],
+    "shuffle": boolean
 }

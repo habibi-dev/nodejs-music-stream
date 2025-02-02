@@ -17,7 +17,8 @@
         "folder1",
         "folder2",
         "folder2"
-      ]
+      ],
+      "shuffle": true
     }
   ]
 }
