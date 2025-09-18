@@ -6,7 +6,7 @@
       "stream_key": "",
       "url_rtmp": "rtmps://dc4-1.rtmp.t.me/s/",
       "dir": "files",
-      "media_type": "video",
+      "media_type": "audio",
       "cover": "src/assets/cover.jpg",
       "audio_codec": "aac",
       "audio_sample_rate": 48000,
