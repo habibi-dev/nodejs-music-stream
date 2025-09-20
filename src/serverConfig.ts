@@ -1,4 +1,4 @@
-﻿import express, { Express } from "express";
+import express, { Express } from "express";
 import type { ServerOptions } from "https";
 import https from "https";
 import fs from "fs";
@@ -9,6 +9,7 @@ import CorsConfig from "./config/CorsConfig";
 import CronConfig from "./config/CronConfig";
 import ModuleMiddlewareConfig from "./config/ModuleMiddlewareConfig";
 import RouteManager from "./routes/RouteManager";
+import AppConfiguratorRegistry from "./services/AppConfiguratorRegistry";
 
 type AppConfigurator = (app: Express) => void;
 
@@ -28,7 +29,8 @@ class ServerConfigurator {
     }
 
     private applyConfigurators(): void {
-        this.configurators.forEach((configure) => configure(this.app));
+        const moduleConfigurators = AppConfiguratorRegistry.getConfigurators();
+        [...this.configurators, ...moduleConfigurators].forEach((configure) => configure(this.app));
     }
 
     private getHttpsOptions(): ServerOptions {
