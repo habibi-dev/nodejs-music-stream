@@ -1,0 +1,81 @@
+{
+  "name": "24/7 Music Channel",
+  "enabled": true,
+  "output": {
+    "local": {
+      "enabled": true
+    },
+    "remote": {
+      "enabled": true,
+      "url": "rtmps://dc4-1.rtmp.t.me/s",
+      "stream_key": "test"
+    }
+  },
+  "schedule": [
+    {
+      "time_type": "daily",
+      "content_type": "file",
+      "start": "00:00",
+      "end": "23:59",
+      "paths": [
+        "E:\\Media"
+      ],
+      "ignore_directories": [
+
+      ],
+      "extensions": [
+        ".mp4"
+      ],
+      "presets": [
+        "audio_premium"
+      ],
+      "sorting": {
+        "method": "random",
+        "order": "desc"
+      },
+      "overlay": {
+        "cover": {
+          "enabled": false,
+          "path": "src/assets/images/cover.png",
+          "fps": 30,
+          "scale": "1280:720",
+          "force_ratio": "decrease"
+        },
+        "logo": {
+          "enabled": true,
+          "path": "src/assets/images/logo.png",
+          "position": "top-left",
+          "scale": "10%",
+          "margin": {
+            "x": 20,
+            "y": 20
+          }
+        },
+        "text": {
+          "enabled": false,
+          "now_playing": {
+            "enabled": true,
+            "position": "bottom-left",
+            "font": "/Windows/Fonts/arial.ttf",
+            "size": 24,
+            "color": "0xffd900",
+            "background": "0x000000@0.8",
+            "padding": 10,
+            "template": "Now Playing: {title}"
+          },
+          "time": {
+            "enabled": true,
+            "position": "bottom-right",
+            "font": "/Windows/Fonts/arial.ttf",
+            "size": 18,
+            "padding": 10,
+            "color": "0xffd900",
+            "background": "0x000000@0.8"
+          }
+        }
+      },
+      "source_live": null
+    }
+  ],
+  "overrides": []
+}
