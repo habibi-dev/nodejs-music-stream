@@ -1,7 +1,27 @@
-import MusicController from "./controller/MusicController";
-import Logger from "./lib/Logger";
+import Logger from "./services/Logger";
+import {bootstrapManager} from "./services/BootstrapManager";
+import {WebService} from "./services/WebService";
 
-Logger.initialize("logs")
+async function bootstrap() {
+    try {
+        // Initialize all modules
+        await bootstrapManager.initialize();
 
-new MusicController().start()
+        // Start server
+        WebService.startServer();
 
+    } catch (error) {
+        Logger.error(`Failed to start application: ${error}`);
+        await bootstrapManager.shutdown();
+        process.exit(1);
+    }
+}
+
+// Graceful shutdown
+process.on('SIGTERM', async () => {
+    Logger.warn('SIGTERM signal received: shutting down gracefully');
+    await bootstrapManager.shutdown();
+    process.exit(0);
+});
+
+bootstrap().then();

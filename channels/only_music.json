@@ -1,0 +1,44 @@
+{
+  "name": "24/7 Music Channel",
+  "enabled": true,
+  "output": {
+    "local": {
+      "enabled": true
+    },
+    "remote": {
+      "enabled": true,
+      "url": "rtmps://dc4-1.rtmp.t.me/s",
+      "stream_key": "test"
+    }
+  },
+  "schedule": [
+    {
+      "time_type": "daily",
+      "content_type": "file",
+      "start": "00:00",
+      "end": "23:59",
+      "paths": [
+        "E:\\TestChannel"
+      ],
+      "ignore_directories": [
+        "podcasts",
+        "audiobooks"
+      ],
+      "extensions": [
+        ".mp4",
+        ".mkv",
+        ".mp3"
+      ],
+      "presets": [
+        "audio_premium"
+      ],
+      "sorting": {
+        "method": "random",
+        "order": "desc"
+      },
+      "overlay": null,
+      "source_live": null
+    }
+  ],
+  "overrides": []
+}

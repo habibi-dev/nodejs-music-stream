@@ -1,0 +1,163 @@
+{
+  "sd_480p": {
+    "label": "SD • 480p",
+    "type": "video",
+    "video": {
+      "codec": "libx264",
+      "bitrate": "1000k",
+      "maxrate": "1200k",
+      "bufsize": "1800k",
+      "scale": "852:480",
+      "fps": 25,
+      "gop": 50,
+      "profile": "main",
+      "level": "3.1",
+      "pix_fmt": "yuv420p"
+    },
+    "audio": {
+      "codec": "aac",
+      "channels": 2,
+      "bitrate": "96k",
+      "samplerate": 44100,
+      "loudnorm": false
+    }
+  },
+  "hd_720p": {
+    "label": "HD • 720p",
+    "type": "video",
+    "video": {
+      "codec": "libx264",
+      "bitrate": "2500k",
+      "maxrate": "3000k",
+      "bufsize": "4500k",
+      "scale": "1280:720",
+      "fps": 25,
+      "gop": 50,
+      "profile": "high",
+      "level": "3.1",
+      "pix_fmt": "yuv420p"
+    },
+    "audio": {
+      "codec": "aac",
+      "channels": 2,
+      "bitrate": "128k",
+      "samplerate": 44100,
+      "loudnorm": false
+    }
+  },
+  "fhd_1080p": {
+    "label": "Full HD • 1080p",
+    "type": "video",
+    "video": {
+      "codec": "libx264",
+      "bitrate": "4000k",
+      "maxrate": "5000k",
+      "bufsize": "7500k",
+      "scale": "1920:1080",
+      "fps": 25,
+      "gop": 50,
+      "profile": "high",
+      "level": "4.0",
+      "pix_fmt": "yuv420p"
+    },
+    "audio": {
+      "codec": "aac",
+      "channels": 2,
+      "bitrate": "160k",
+      "samplerate": 44100,
+      "loudnorm": false
+    }
+  },
+  "uhd_4k": {
+    "label": "Ultra HD • 4K",
+    "type": "video",
+    "video": {
+      "codec": "libx264",
+      "bitrate": "8000k",
+      "maxrate": "10000k",
+      "bufsize": "15000k",
+      "scale": "3840:2160",
+      "fps": 30,
+      "gop": 60,
+      "profile": "high",
+      "level": "5.1",
+      "pix_fmt": "yuv420p"
+    },
+    "audio": {
+      "codec": "aac",
+      "channels": 2,
+      "bitrate": "192k",
+      "samplerate": 44100,
+      "loudnorm": false
+    }
+  },
+  "audio_high": {
+    "label": "High Quality Audio",
+    "type": "audio",
+    "video": {
+      "codec": "libx264",
+      "bitrate": "1000k",
+      "maxrate": "1200k",
+      "bufsize": "1800k",
+      "scale": "852:480",
+      "fps": 25,
+      "gop": 50,
+      "profile": "main",
+      "level": "3.1",
+      "pix_fmt": "yuv420p"
+    },
+    "audio": {
+      "codec": "aac",
+      "channels": 2,
+      "bitrate": "320k",
+      "samplerate": 48000,
+      "loudnorm": false
+    }
+  },
+  "audio_lossless": {
+    "label": "Lossless Audio",
+    "type": "audio",
+    "video": {
+      "codec": "libx264",
+      "bitrate": "1000k",
+      "maxrate": "1200k",
+      "bufsize": "1800k",
+      "scale": "852:480",
+      "fps": 25,
+      "gop": 50,
+      "profile": "main",
+      "level": "3.1",
+      "pix_fmt": "yuv420p"
+    },
+    "audio": {
+      "codec": "flac",
+      "channels": 2,
+      "bitrate": "0",
+      "samplerate": 48000,
+      "loudnorm": false
+    }
+  },
+  "audio_premium": {
+    "label": "Premium Audio Stream",
+    "type": "audio",
+    "video": {
+      "codec": "libx264",
+      "bitrate": "1000k",
+      "maxrate": "1200k",
+      "bufsize": "1800k",
+      "scale": "852:480",
+      "fps": 25,
+      "gop": 50,
+      "profile": "main",
+      "level": "3.1",
+      "pix_fmt": "yuv420p"
+    },
+    "audio": {
+      "codec": "aac",
+      "channels": 2,
+      "bitrate": "256k",
+      "samplerate": 48000,
+      "loudnorm": true
+    }
+  }
+}

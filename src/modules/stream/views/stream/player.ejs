@@ -1,0 +1,74 @@
+﻿<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+    <meta charset="utf-8"/>
+    <title><%= title %></title>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <meta http-equiv="Cache-Control" content="no-store"/>
+    <link rel="stylesheet" href="/stream/player.css?v=<%= cacheBust %>">
+</head>
+<body>
+<main class="player-container" data-stream-root data-channel-id="<%= channelId %>"
+      data-stream-url="<%= streamM3u8Url %>" data-autoplay-muted="<%= autoplayMuted %>">
+    <header class="player-header">
+        <h1 class="player-title"><%= title %></h1>
+        <p class="player-meta">Channel: <span><%= channelId %></span></p>
+    </header>
+    <section class="player-shell">
+        <video
+                id="player-video"
+                class="player-video"
+                autoplay
+                muted
+                playsinline
+                preload="none"
+                poster=""
+        ></video>
+        <div id="player-overlay" class="player-overlay">
+            <div id="overlay-message" class="player-overlay__message"></div>
+            <button id="overlay-action" class="player-overlay__action is-hidden" type="button"></button>
+        </div>
+        <div class="player-controls" data-player-controls>
+            <button type="button" class="player-control player-control--mute" data-action="mute" aria-pressed="true"
+                    aria-label="Unmute audio" title="Unmute audio">
+                <span class="player-control__icon" data-icon="unmuted" aria-hidden="true">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                         stroke="currentColor" class="size-6">
+                      <path stroke-linecap="round" stroke-linejoin="round"
+                            d="M19.114 5.636a9 9 0 0 1 0 12.728M16.463 8.288a5.25 5.25 0 0 1 0 7.424M6.75 8.25l4.72-4.72a.75.75 0 0 1 1.28.53v15.88a.75.75 0 0 1-1.28.53l-4.72-4.72H4.51c-.88 0-1.704-.507-1.938-1.354A9.009 9.009 0 0 1 2.25 12c0-.83.112-1.633.322-2.396C2.806 8.756 3.63 8.25 4.51 8.25H6.75Z"/>
+                    </svg>
+                </span>
+                <span class="player-control__icon" data-icon="muted" aria-hidden="true">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                         stroke="currentColor" class="size-6">
+                      <path stroke-linecap="round" stroke-linejoin="round"
+                            d="M17.25 9.75 19.5 12m0 0 2.25 2.25M19.5 12l2.25-2.25M19.5 12l-2.25 2.25m-10.5-6 4.72-4.72a.75.75 0 0 1 1.28.53v15.88a.75.75 0 0 1-1.28.53l-4.72-4.72H4.51c-.88 0-1.704-.507-1.938-1.354A9.009 9.009 0 0 1 2.25 12c0-.83.112-1.633.322-2.396C2.806 8.756 3.63 8.25 4.51 8.25H6.75Z"/>
+                    </svg>
+                </span>
+            </button>
+            <button type="button" class="player-control player-control--fullscreen" data-action="fullscreen"
+                    aria-pressed="false" aria-label="Enter fullscreen" title="Enter fullscreen">
+                <span class="player-control__icon" data-icon="enter" aria-hidden="true">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                         stroke="currentColor" class="size-6">
+                      <path stroke-linecap="round" stroke-linejoin="round"
+                            d="M3.75 3.75v4.5m0-4.5h4.5m-4.5 0L9 9M3.75 20.25v-4.5m0 4.5h4.5m-4.5 0L9 15M20.25 3.75h-4.5m4.5 0v4.5m0-4.5L15 9m5.25 11.25h-4.5m4.5 0v-4.5m0 4.5L15 15"/>
+                    </svg>
+                </span>
+                <span class="player-control__icon" data-icon="exit" aria-hidden="true">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M9 9V4.5M9 9H4.5M9 9 3.75 3.75M9 15v4.5M9 15H4.5M9 15l-5.25 5.25M15 9h4.5M15 9V4.5M15 9l5.25-5.25M15 15h4.5M15 15v4.5m0-4.5 5.25 5.25" />
+                    </svg>
+                </span>
+            </button>
+        </div>
+    </section>
+    <p id="player-status" class="player-status"></p>
+    <noscript>
+        Enable JavaScript to watch this stream.
+    </noscript>
+</main>
+<script src="/vendor/hls/hls.min.js?v=<%= cacheBust %>" defer></script>
+<script src="/stream/player.js?v=<%= cacheBust %>" defer></script>
+</body>
+</html>
