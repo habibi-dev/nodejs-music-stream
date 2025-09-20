@@ -31,7 +31,7 @@ export class WebService {
         } else {
             const protocol = port === 443 ? "https" : "http";
             Logger.info("Is Running! 🙂😍😋😈");
-            Logger.info(`Visit: ${protocol}://${domain}${port === 443 ? "" : `:${port}`}/status`);
+            Logger.info(`Visit: ${protocol}://${domain}${port === 443 ? "" : `:${port}`}/api/status`);
         }
     }
 }
