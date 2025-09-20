@@ -12,7 +12,7 @@ import fs from "fs";
 
 class StreamOverlay {
     private static instance: StreamOverlay;
-    private config!: OverlayInterface;
+    private config: OverlayInterface | null = null;
     private isLoaded = false;
 
     static getInstance(): StreamOverlay {
@@ -28,105 +28,117 @@ class StreamOverlay {
         this.isLoaded = true;
     }
 
-    getConfig(): OverlayInterface {
-        this.ensureLoaded();
-        return this.config;
+    getConfig(override?: OverlayInterface | null): OverlayInterface {
+        const config = this.resolveConfig(override);
+        if (!config) {
+            throw new Error('Overlay configuration not available');
+        }
+        return config;
     }
 
-    getLogoConfig(): OverlayLogoConfigInterface {
-        this.ensureLoaded();
-        return this.config.logo;
+    getLogoConfig(override?: OverlayInterface | null): OverlayLogoConfigInterface {
+        const config = this.resolveConfig(override);
+        if (!config?.logo) {
+            throw new Error('Overlay logo configuration missing');
+        }
+        return config.logo;
     }
 
-    getTextConfig(): OverlayTextConfigInterface {
-        this.ensureLoaded();
-        return this.config.text;
+    getTextConfig(override?: OverlayInterface | null): OverlayTextConfigInterface {
+        const config = this.resolveConfig(override);
+        if (!config?.text) {
+            throw new Error('Overlay text configuration missing');
+        }
+        return config.text;
     }
 
-    getNowPlayingConfig(): OverlayNowPlayingConfigInterface {
-        this.ensureLoaded();
-        return this.config.text.now_playing;
+    getNowPlayingConfig(override?: OverlayInterface | null): OverlayNowPlayingConfigInterface {
+        const text = this.getTextConfig(override);
+        if (!text?.now_playing) {
+            throw new Error('Overlay now playing configuration missing');
+        }
+        return text.now_playing;
     }
 
-    getTimeConfig(): OverlayTimeConfigInterface {
-        this.ensureLoaded();
-        return this.config.text.time;
+    getTimeConfig(override?: OverlayInterface | null): OverlayTimeConfigInterface {
+        const text = this.getTextConfig(override);
+        if (!text?.time) {
+            throw new Error('Overlay time configuration missing');
+        }
+        return text.time;
     }
 
-    isLogoEnabled(): boolean {
-        this.ensureLoaded();
-        return this.config.logo.enabled || false;
+    isLogoEnabled(override?: OverlayInterface | null): boolean {
+        const config = this.resolveConfig(override);
+        return !!config?.logo?.enabled;
     }
 
-    isTextEnabled(): boolean {
-        this.ensureLoaded();
-        return this.config.text.enabled || false;
+    isTextEnabled(override?: OverlayInterface | null): boolean {
+        const config = this.resolveConfig(override);
+        return !!config?.text?.enabled;
     }
 
-    isNowPlayingEnabled(): boolean {
-        this.ensureLoaded();
-        return this.config.text.now_playing.enabled || false;
+    isNowPlayingEnabled(override?: OverlayInterface | null): boolean {
+        const text = this.resolveConfig(override)?.text;
+        return !!text?.now_playing?.enabled;
     }
 
-    isTimeEnabled(): boolean {
-        this.ensureLoaded();
-        return this.config.text.time.enabled || false;
+    isTimeEnabled(override?: OverlayInterface | null): boolean {
+        const text = this.resolveConfig(override)?.text;
+        return !!text?.time?.enabled;
     }
 
-    getLogoArgs(): string[] {
-        const logo = this.getLogoConfig();
+    getLogoArgs(override?: OverlayInterface | null): string[] {
+        const logo = this.resolveConfig(override)?.logo;
         return (logo && logo.enabled) ? FFmpegOverlayArgsBuilder.buildLogoArgs(logo) : [];
     }
 
-    getNowPlayingArgs(title?: string): string[] {
-        const nowPlaying = this.getNowPlayingConfig();
+    getNowPlayingArgs(title?: string, override?: OverlayInterface | null): string[] {
+        const nowPlaying = this.resolveConfig(override)?.text?.now_playing;
         return (nowPlaying && nowPlaying.enabled) ?
             FFmpegOverlayArgsBuilder.buildNowPlayingArgs(nowPlaying, title) : [];
     }
 
-    getTimeArgs(): string[] {
-        const time = this.getTimeConfig();
+    getTimeArgs(override?: OverlayInterface | null): string[] {
+        const time = this.resolveConfig(override)?.text?.time;
         return (time && time.enabled) ? FFmpegOverlayArgsBuilder.buildTimeArgs(time) : [];
     }
 
-    getAllOverlayArgs(title?: string): string[] {
-
-        this.ensureLoaded();
-        if (!this.config) return [];
+    getAllOverlayArgs(title?: string, override?: OverlayInterface | null): string[] {
+        const config = this.resolveConfig(override);
+        if (!config) return [];
 
         const args: string[] = [];
 
-        // Add logo overlay
-        if (this.isLogoEnabled()) {
-            args.push(...this.getLogoArgs());
+        if (config.logo?.enabled) {
+            args.push(...this.getLogoArgs(override));
         }
 
-        // Add text overlays
-        if (this.isTextEnabled()) {
-            if (this.isNowPlayingEnabled()) {
-                args.push(...this.getNowPlayingArgs(title));
+        if (config.text?.enabled) {
+            if (config.text.now_playing?.enabled) {
+                args.push(...this.getNowPlayingArgs(title, override));
             }
 
-            if (this.isTimeEnabled()) {
-                args.push(...this.getTimeArgs());
+            if (config.text.time?.enabled) {
+                args.push(...this.getTimeArgs(override));
             }
         }
 
         return args;
     }
 
-    isCoverEnabled(): boolean {
-        this.ensureLoaded();
-        return !!this.config.cover?.enabled && !!this.config.cover?.path;
+    isCoverEnabled(override?: OverlayInterface | null): boolean {
+        const cover = this.resolveConfig(override)?.cover;
+        return !!cover?.enabled && !!cover?.path;
     }
 
-    getCoverConfig(): OverlayCoverConfigInterface | null {
-        this.ensureLoaded();
-        return this.config.cover ?? null;
+    getCoverConfig(override?: OverlayInterface | null): OverlayCoverConfigInterface | null {
+        const config = this.resolveConfig(override);
+        return config?.cover ?? null;
     }
 
-    getCoverInputArgs(): string[] {
-        const c = this.getCoverConfig();
+    getCoverInputArgs(override?: OverlayInterface | null): string[] {
+        const c = this.getCoverConfig(override);
         if (!c || !c.enabled || !c.path) return [];
         const p = path.isAbsolute(c.path) ? c.path : path.join(process.cwd(), c.path);
         if (!fs.existsSync(p)) return [];
@@ -134,8 +146,8 @@ class StreamOverlay {
         return ["-loop", "1", "-framerate", fps, "-i", p];
     }
 
-    getCoverFilterGraphLabel(): string {
-        const c = this.getCoverConfig();
+    getCoverFilterGraphLabel(override?: OverlayInterface | null): string {
+        const c = this.getCoverConfig(override);
         const scale = c?.scale ?? "1280:720";
         const fr = c?.force_ratio ?? "decrease";
         const base = `[1:v]scale=${scale}:force_original_aspect_ratio=${fr}`;
@@ -143,8 +155,8 @@ class StreamOverlay {
         return `${base}${pad},format=yuv420p[vbase]`;
     }
 
-    getCompleteFilterComplex(title?: string): string {
-        const overlayArgs = this.getAllOverlayArgs(title);
+    getCompleteFilterComplex(title?: string, override?: OverlayInterface | null): string {
+        const overlayArgs = this.getAllOverlayArgs(title, override);
         return overlayArgs.length > 0 ? overlayArgs.join(',') : '';
     }
 
@@ -152,6 +164,14 @@ class StreamOverlay {
         if (!this.isLoaded) {
             this.loadFromFile();
         }
+    }
+
+    private resolveConfig(override?: OverlayInterface | null): OverlayInterface | null {
+        if (override) {
+            return override;
+        }
+        this.ensureLoaded();
+        return this.config;
     }
 }
 

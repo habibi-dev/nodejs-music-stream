@@ -78,8 +78,8 @@ export class StreamFFmpegArgsBuilder {
         }
 
         // Add logo input if enabled (for both audio and video)
-        if (StreamOverlay.isLogoEnabled()) {
-            const logoConfig = StreamOverlay.getLogoConfig();
+        if (StreamOverlay.isLogoEnabled(playlist.overlay)) {
+            const logoConfig = StreamOverlay.getLogoConfig(playlist.overlay);
             const logoPath = path.isAbsolute(logoConfig.path)
                 ? logoConfig.path
                 : path.join(process.cwd(), logoConfig.path);
@@ -115,7 +115,7 @@ export class StreamFFmpegArgsBuilder {
     }
 
     private getCoverInput(playlist: PlaylistItemInterface): string[] {
-        const coverInput = StreamOverlay.getCoverInputArgs?.();
+        const coverInput = StreamOverlay.getCoverInputArgs?.(playlist.overlay);
         if (coverInput?.length > 0) {
             return coverInput;
         }

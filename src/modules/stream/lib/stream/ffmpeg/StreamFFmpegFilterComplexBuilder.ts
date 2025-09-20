@@ -1,5 +1,6 @@
 import StreamOverlay from "../../../config/StreamOverlay";
 import {PlaylistItemInterface} from "../../../interfaces/PlaylistItemInterface";
+import {OverlayInterface} from "../../../interfaces/OverlayInterface";
 import {MediaInfo} from "../StreamFFmpegArgsBuilder";
 import StreamPresets from "../../../config/StreamPresets";
 import Logger from "../../../../../services/Logger";
@@ -17,6 +18,7 @@ export class StreamFFmpegFilterComplexBuilder {
         let filterGraph = "";
         let currentInput = "[0:v]";
         let inputIndex = 1;
+        const overlayOverride = playlist.overlay ?? null;
 
         // Handle audio-only content - add cover
         if (isAudioOnly) {
@@ -45,7 +47,7 @@ export class StreamFFmpegFilterComplexBuilder {
         }
 
         // Add logo overlay (for both audio and video)
-        const logoResult = this.addLogoOverlay(filterGraph, currentInput, inputIndex);
+        const logoResult = this.addLogoOverlay(filterGraph, currentInput, inputIndex, overlayOverride);
         filterGraph = logoResult.filterGraph;
         currentInput = logoResult.currentInput;
         inputIndex = logoResult.inputIndex;
@@ -54,7 +56,8 @@ export class StreamFFmpegFilterComplexBuilder {
         const finalFilter = this.addTextOverlays(
             filterGraph,
             currentInput,
-            mediaInfo?.nowPlayingTitle ?? "-"
+            mediaInfo?.nowPlayingTitle ?? "-",
+            overlayOverride
         );
 
         // Return empty string only if no processing was done at all
@@ -65,12 +68,12 @@ export class StreamFFmpegFilterComplexBuilder {
         return finalFilter;
     }
 
-    private addLogoOverlay(filterGraph: string, currentInput: string, inputIndex: number) {
-        if (!this.overlay.isLogoEnabled()) {
+    private addLogoOverlay(filterGraph: string, currentInput: string, inputIndex: number, override: OverlayInterface | null) {
+        if (!this.overlay.isLogoEnabled(override)) {
             return {filterGraph, currentInput, inputIndex};
         }
 
-        const logoConfig = this.overlay.getLogoConfig();
+        const logoConfig = this.overlay.getLogoConfig(override);
         const logoPath = path.isAbsolute(logoConfig.path)
             ? logoConfig.path
             : path.join(process.cwd(), logoConfig.path);
@@ -98,8 +101,8 @@ export class StreamFFmpegFilterComplexBuilder {
     }
 
 
-    private addTextOverlays(filterGraph: string, currentInput: string, nowPlayingTitle?: string): string {
-        const textFilters = this.buildTextOverlays(nowPlayingTitle);
+    private addTextOverlays(filterGraph: string, currentInput: string, nowPlayingTitle: string | undefined, override: OverlayInterface | null): string {
+        const textFilters = this.buildTextOverlays(nowPlayingTitle, override);
 
         if (textFilters.length > 0) {
             const textFilterStr = textFilters.join(',');
@@ -120,18 +123,18 @@ export class StreamFFmpegFilterComplexBuilder {
         return "";
     }
 
-    private buildTextOverlays(nowPlayingTitle?: string): string[] {
+    private buildTextOverlays(nowPlayingTitle: string | undefined, override: OverlayInterface | null): string[] {
         const filters: string[] = [];
 
-        if (this.overlay.isNowPlayingEnabled() && nowPlayingTitle) {
-            const nowPlayingFilter = this.buildNowPlayingTextFilter(nowPlayingTitle);
+        if (this.overlay.isNowPlayingEnabled(override) && nowPlayingTitle) {
+            const nowPlayingFilter = this.buildNowPlayingTextFilter(nowPlayingTitle, override);
             if (nowPlayingFilter) {
                 filters.push(nowPlayingFilter);
             }
         }
 
-        if (this.overlay.isTimeEnabled()) {
-            const timeFilter = this.buildTimeTextFilter();
+        if (this.overlay.isTimeEnabled(override)) {
+            const timeFilter = this.buildTimeTextFilter(override);
             if (timeFilter) {
                 filters.push(timeFilter);
             }
@@ -140,8 +143,8 @@ export class StreamFFmpegFilterComplexBuilder {
         return filters;
     }
 
-    private buildNowPlayingTextFilter(title: string): string | null {
-        const config = this.overlay.getNowPlayingConfig();
+    private buildNowPlayingTextFilter(title: string, override: OverlayInterface | null): string | null {
+        const config = this.overlay.getNowPlayingConfig(override);
         if (!config?.enabled) return null;
 
         const escapedTitle = this.escapeFFmpegText(title);
@@ -152,8 +155,8 @@ export class StreamFFmpegFilterComplexBuilder {
         return `drawtext=text='${escapedText}':${style}:${position}`;
     }
 
-    private buildTimeTextFilter(): string | null {
-        const config = this.overlay.getTimeConfig();
+    private buildTimeTextFilter(override: OverlayInterface | null): string | null {
+        const config = this.overlay.getTimeConfig(override);
         if (!config?.enabled) return null;
 
         const position = this.getTextPosition(config.position);
