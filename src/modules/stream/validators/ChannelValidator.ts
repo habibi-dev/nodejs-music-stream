@@ -5,6 +5,7 @@ import {
     SortingOrder
 } from '../interfaces/ChannelInterface';
 import StreamPresets from "../config/StreamPresets";
+import {OverlayInterface} from "../interfaces/OverlayInterface";
 
 export class ChannelValidator {
 
@@ -200,10 +201,10 @@ export class ChannelValidator {
         ChannelValidator.validatePresets(item.presets);
 
 
-        // Validate overlay (string or null)
-        if (item.overlay !== null && typeof item.overlay !== 'string') {
-            throw new Error(`${prefix}.overlay must be string or null`);
-        }
+        // // Validate overlay (string or null)
+        // if (item.overlay !== null && typeof item.overlay !== OverlayInterface) {
+        //     throw new Error(`${prefix}.overlay must be string or null`);
+        // }
 
         // Validate source_live
         ChannelValidator.validateSourceLive(item.source_live, `${prefix}.source_live`);
