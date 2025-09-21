@@ -1,4 +1,4 @@
-﻿import {PlaylistItemInterface} from "../../interfaces/PlaylistItemInterface";
+import {PlaylistItemInterface} from "../../interfaces/PlaylistItemInterface";
 import {ChannelInterface} from "../../interfaces/ChannelInterface";
 import Logger from "../../../../services/Logger";
 import ChannelPlaylist from "../channel/ChannelPlaylist";
@@ -104,12 +104,12 @@ export class StreamChannelRuntime {
             return;
         }
 
-        this.stateManager.advanceFile(this.channelId, files.length, LOOP_PLAYLIST_FILES);
+        const completedCycle = this.stateManager.advanceFile(this.channelId, files.length, LOOP_PLAYLIST_FILES);
 
         if (code !== 0) {
             this.handleError();
         } else {
-            this.handleSuccess(files.length);
+            this.handleSuccess(files.length, completedCycle, playlist);
         }
     }
 
@@ -121,8 +121,23 @@ export class StreamChannelRuntime {
         this.scheduleRetry(delay);
     }
 
-    private handleSuccess(totalFiles: number): void {
+    private handleSuccess(totalFiles: number, completedCycle: boolean, playlist: PlaylistItemInterface): void {
         const state = this.getState();
+
+        if (completedCycle) {
+            try {
+                const refreshed = this.playlistFiles.buildForItem(playlist);
+                Logger.info(
+                    `Completed playlist cycle; refreshed ${refreshed.length} file(s) for channel=${this.channelId}`,
+                    "stream"
+                );
+            } catch (error: any) {
+                Logger.error(
+                    `Failed to refresh files after playlist cycle for channel=${this.channelId}: ${error?.message ?? error}`,
+                    "stream"
+                );
+            }
+        }
 
         if (!LOOP_PLAYLIST_FILES && state.fileIdx >= totalFiles - 1) {
             Logger.info(`Reached end of playlist (no loop) for channel=${this.channelId}`, "stream");
@@ -195,6 +210,7 @@ export class StreamChannelRuntime {
         return state;
     }
 }
+
 
 
 

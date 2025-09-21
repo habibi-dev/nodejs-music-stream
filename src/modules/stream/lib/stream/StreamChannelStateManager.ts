@@ -35,9 +35,16 @@ export class StreamChannelStateManager {
         }
     }
 
-    advanceFile(channelId: string, totalFiles: number, loop = true, producedSegments = 0): void {
+    advanceFile(channelId: string, totalFiles: number, loop = true, producedSegments = 0): boolean {
         const state = this.states.get(channelId);
-        if (!state) return;
+        if (!state) return false;
+
+        if (totalFiles <= 0) {
+            state.fileIdx = 0;
+            return false;
+        }
+
+        const prevIdx = state.fileIdx;
 
         if (loop) {
             state.fileIdx = (state.fileIdx + 1) % totalFiles;
@@ -46,6 +53,12 @@ export class StreamChannelStateManager {
         }
 
         state.segmentIndex += producedSegments;
+
+        if (loop) {
+            return ((prevIdx + 1) % totalFiles) === 0;
+        }
+
+        return state.fileIdx >= totalFiles - 1;
     }
 
     setBackoff(channelId: string, error = false): void {
@@ -72,3 +85,4 @@ export class StreamChannelStateManager {
         return Array.from(this.states.keys());
     }
 }
+

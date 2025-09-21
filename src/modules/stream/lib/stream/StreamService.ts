@@ -15,6 +15,8 @@ class StreamService {
     private channels = new Map<string, ChannelInterface>();
     private channelRuntimes = new Map<string, StreamChannelRuntime>();
     private timer: NodeJS.Timeout | null = null;
+    private currentPlaylistDateKey: string | null = null;
+    private isReloading = false;
 
     constructor(
         private readonly stateManager = new StreamChannelStateManager(),
@@ -39,7 +41,8 @@ class StreamService {
 
         this.directoryManager.clearOldHlsDirectories();
         this.directoryManager.ensureHlsDirectories();
-        this.channels = this.channelReader.load();
+        this.channels = this.channelReader.load(date);
+        this.currentPlaylistDateKey = this.toDateKey(date);
 
         this.stateManager.clearAll();
         this.channelRuntimes.clear();
@@ -87,6 +90,11 @@ class StreamService {
 
     private tick(): void {
         const now = new Date();
+        const dateKey = this.toDateKey(now);
+
+        if (this.currentPlaylistDateKey !== dateKey) {
+            this.reloadForDate(now);
+        }
 
         for (const [channelId, runtime] of this.channelRuntimes) {
             const channel = this.channels.get(channelId);
@@ -102,9 +110,53 @@ class StreamService {
             runtime.shutdown();
         }
     }
+
+    private reloadForDate(date: Date): void {
+        if (this.isReloading) {
+            return;
+        }
+
+        this.isReloading = true;
+        const targetKey = this.toDateKey(date);
+
+        try {
+            Logger.info(`Rolling playlist date forward to ${targetKey}`, "stream");
+
+            this.stopAllChannels();
+            this.stateManager.clearAll();
+            this.channelRuntimes.clear();
+
+            this.channels = this.channelReader.load(date);
+            this.currentPlaylistDateKey = targetKey;
+
+            for (const [channelId, channel] of this.channels) {
+                this.stateManager.initChannel(channelId);
+                this.directoryManager.ensureChannelDirectory(channelId);
+
+                this.channelRuntimes.set(
+                    channelId,
+                    new StreamChannelRuntime(
+                        channelId,
+                        channel,
+                        this.stateManager,
+                        this.argsBuilder,
+                        this.processManager,
+                        this.playlist
+                    )
+                );
+            }
+
+            Logger.info(`Reloaded channels for new day count=${this.channels.size}`, "stream");
+        } catch (error: any) {
+            Logger.error(`Failed to reload channels for ${targetKey}: ${error?.message ?? error}`, "stream");
+        } finally {
+            this.isReloading = false;
+        }
+    }
+
+    private toDateKey(date: Date): string {
+        return date.toISOString().slice(0, 10);
+    }
 }
 
 export default StreamService.getInstance();
-
-
-

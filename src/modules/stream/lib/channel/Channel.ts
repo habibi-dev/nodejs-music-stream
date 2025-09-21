@@ -18,7 +18,7 @@ class Channel {
         return Channel.instance;
     }
 
-    load(): Map<string, ChannelInterface> {
+    load(date: Date = new Date()): Map<string, ChannelInterface> {
         this.channels.clear();
         const dirPath = path.join(process.cwd(), "channels");
         const map = new Map<string, ChannelInterface>();
@@ -44,7 +44,7 @@ class Channel {
 
         Logger.info(`Found ${this.channels.size} channel(s).`, "channel");
 
-        this.playlist.load(this.channels);
+        this.playlist.load(this.channels, date);
 
         return this.channels;
     }
